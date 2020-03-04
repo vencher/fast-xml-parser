@@ -3,6 +3,7 @@
 const util = require('./util');
 const buildOptions = require('./util').buildOptions;
 const xmlNode = require('./xmlNode');
+const xmlNode2 = require('./xmlNode2');
 const TagType = {OPENING: 1, CLOSING: 2, SELF: 3, CDATA: 4};
 const regx =
   '<((!\\[CDATA\\[([\\s\\S]*?)(]]>))|((NAME:)?(NAME))([^>]*)>|((\\/)(NAME)\\s*>))([^<]*)'
@@ -29,7 +30,8 @@ const defaultOptions = {
   //ignoreRootElement : false,
   parseNodeValue: true,
   parseAttributeValue: false,
-  arrayMode: false,
+  parseAnnotation: false,
+  arrayMode: false, // true, children, strict
   trimValues: true, //Trim string values of tag and attributes
   cdataTagName: false,
   cdataPositionChar: '\\c',
@@ -53,6 +55,7 @@ const props = [
   'ignoreNameSpace',
   'allowBooleanAttributes',
   'parseNodeValue',
+  'parseAnnotation',
   'parseAttributeValue',
   'arrayMode',
   'trimValues',
@@ -68,9 +71,14 @@ exports.props = props;
 const getTraversalObj = function(xmlData, options) {
   options = buildOptions(options, defaultOptions, props);
   //xmlData = xmlData.replace(/\r?\n/g, " ");//make it single line
-  xmlData = xmlData.replace(/<!--[\s\S]*?-->/g, ''); //Remove  comments
 
-  const xmlObj = new xmlNode('!xml');
+  if (options.parseAnnotation) {
+      xmlData = xmlData.replace(/<!--([\s\S]*?)-->/g, '<__annotation><![CDATA[$1]]></__annotation>'); // 支持注释
+  }else{
+      xmlData = xmlData.replace(/<!--[\s\S]*?-->/g, ''); //Remove  comments
+  }
+
+  const xmlObj = new (options.arrayMode === "children" ? xmlNode2 : xmlNode)('!xml');
   let currentNode = xmlObj;
 
   const tagsRegx = new RegExp(regx, 'g');
@@ -93,7 +101,7 @@ const getTraversalObj = function(xmlData, options) {
     } else if (tagType === TagType.CDATA) {
       if (options.cdataTagName) {
         //add cdata node
-        const childNode = new xmlNode(options.cdataTagName, currentNode, tag[3]);
+        const childNode = new (options.arrayMode === "children" ? xmlNode2 : xmlNode)(options.cdataTagName, currentNode, tag[3]);
         childNode.attrsMap = buildAttributesMap(tag[8], options);
         currentNode.addChild(childNode);
         //for backtracking
@@ -110,7 +118,7 @@ const getTraversalObj = function(xmlData, options) {
         currentNode.val = util.getValue(currentNode.val) + '' + processTagValue(tag, options);
       }
 
-      const childNode = new xmlNode(options.ignoreNameSpace ? tag[7] : tag[5], currentNode, '');
+      const childNode = new (options.arrayMode === "children" ? xmlNode2 : xmlNode)(options.ignoreNameSpace ? tag[7] : tag[5], currentNode, '');
       if (tag[8] && tag[8].length > 0) {
         tag[8] = tag[8].substr(0, tag[8].length - 1);
       }
@@ -118,7 +126,7 @@ const getTraversalObj = function(xmlData, options) {
       currentNode.addChild(childNode);
     } else {
       //TagType.OPENING
-      const childNode = new xmlNode(
+      const childNode = new (options.arrayMode === "children" ? xmlNode2 : xmlNode)(
         options.ignoreNameSpace ? tag[7] : tag[5],
         currentNode,
         processTagValue(tag, options)
