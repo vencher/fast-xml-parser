@@ -113,6 +113,7 @@ const getTraversalObj = function(xmlData, options) {
       } else {
         currentNode.val = (currentNode.val || '') + (tag[3] || '') + processTagValue(tag, options);
       }
+      currentNode.cdata = true;
     } else if (tagType === TagType.SELF) {
       if (currentNode && tag[12]) {
         currentNode.val = util.getValue(currentNode.val) + '' + processTagValue(tag, options);

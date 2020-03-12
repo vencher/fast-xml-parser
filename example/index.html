@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="../lib/parser.js"></script>
+</head>
+<body>
+    <div id="xmldata">
+        &lt;?xml version="1.0" encoding="utf-8"?&gt;
+
+        &lt;ROOT&gt;
+        &lt;HEAD&gt;
+        &lt;MSGCODE&gt;YA82&lt;/MSGCODE&gt;
+        &lt;!-- MSGID:MSGID=0(YA82_20200302141211) --&gt;
+        &lt;MSGID/&gt;
+        &lt;MSGNAME&gt;SAP2NC资产变动&lt;/MSGNAME&gt;
+        &lt;SOURCESYS&gt;HB_I_M_D_NC&lt;/SOURCESYS&gt;
+        &lt;TARGETSYS&gt;HB_I_M_D_NC&lt;/TARGETSYS&gt;
+        &lt;CREATETIME&gt;#Sys_ts#&lt;/CREATETIME&gt;
+        &lt;/HEAD&gt;
+        &lt;LINES&gt;
+        &lt;!-- NCBILL:ITEM --&gt;
+        &lt;ITEM&gt;
+        &lt;ITEM_HEAD&gt;
+        &lt;PK_CORP&gt;${pk_corp}&lt;/PK_CORP&gt;
+        &lt;RECORDER&gt;${voperatorid}&lt;/RECORDER&gt;
+        &lt;BILLCODE&gt;${vbillcode}&lt;/BILLCODE&gt;
+        &lt;ALTERDATE&gt;${dbilldate}&lt;/ALTERDATE&gt;
+        &lt;/ITEM_HEAD&gt;
+        &lt;ITEM_BODYS TABLE="ycam_alter_b"&gt;
+        &lt;!-- NCBILLBODY:ITEM_BODY=ycam_alter_b--&gt;
+        &lt;ITEM_BODY&gt;
+        &lt;ASSET_CODE&gt;${pk_equip}&lt;/ASSET_CODE&gt;
+        &lt;ALTERTYPE&gt;3&lt;/ALTERTYPE&gt;
+        &lt;ALTERVALUE&gt;${pk_usedept_alter}&lt;/ALTERVALUE&gt;
+        &lt;REASON&gt;&lt;![CDATA[${pk_alterreason}]]&gt;&lt;/REASON&gt;
+        &lt;SAP_ASSECTCODE&gt;${pk_equip}&lt;/SAP_ASSECTCODE&gt;
+        &lt;PK_CORP&gt;${H.pk_crop}&lt;/PK_CORP&gt;
+        &lt;!-- NCBILLGRANDBODY:ITEM_GRANDBODY=ycam_alter_bb --&gt;
+        &lt;ITEM_GRANDBODY&gt;
+        &lt;VEQUIPCODE&gt;${pk_equip}&lt;/VEQUIPCODE&gt;
+        &lt;NMUSTMNY&gt;${nmustnmy}&lt;/NMUSTMNY&gt;
+        &lt;NFINISHMNY&gt;${nfinishmny}&lt;/NFINISHMNY&gt;
+        &lt;PK_CORP&gt;${H.pk_corp}&lt;/PK_CORP&gt;
+        &lt;REASON&gt;${ycam_alter_b.pk_alterreason}&lt;/REASON&gt;
+        &lt;/ITEM_GRANDBODY&gt;
+        &lt;/ITEM_BODY&gt;
+        &lt;/ITEM_BODYS&gt;
+        &lt;ITEM_BODYS TABLE="ycam_alter_b2"&gt;
+        &lt;!-- NCBILLBODY:ITEM_BODY=ycam_alter_b2 --&gt;
+        &lt;ITEM_BODY&gt;
+        &lt;ASSET_CODE&gt;${pk_equip}&lt;/ASSET_CODE&gt;
+        &lt;ALTERTYPE&gt;4&lt;/ALTERTYPE&gt;
+        &lt;MANDEPTCODE&gt;${pk_mandept_alter}&lt;/MANDEPTCODE&gt;
+        &lt;USEDEPTCODE&gt;${pk_useept_alter}&lt;/USEDEPTCODE&gt;
+        &lt;REASON&gt;&lt;![CDATA[${pk_alterreason}]]&gt;&lt;/REASON&gt;
+        &lt;SAP_ASSECTCODE&gt;${pk_equip}&lt;/SAP_ASSECTCODE&gt;
+        &lt;PK_CORP&gt;${H.pk_crop}&lt;/PK_CORP&gt;
+        &lt;/ITEM_BODY&gt;
+        &lt;/ITEM_BODYS&gt;
+        &lt;/ITEM&gt;
+        &lt;/LINES&gt;
+        &lt;/ROOT&gt;
+    </div>
+
+    <script>
+        var xmlData = document.querySelector('#xmldata').innerText;
+
+        window.xmlObj = parser.getTraversalObj(xmlData, {
+            arrayMode: 'children',
+            parseAnnotation: true,
+            ignoreAttributes: false
+        });
+        console.log(xmlObj.child[0].child[1].child[1].child[1].child[1].child[4])
+
+
+    </script>
+</body>
+</html>
