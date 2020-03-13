@@ -8,6 +8,7 @@ const TagType = {OPENING: 1, CLOSING: 2, SELF: 3, CDATA: 4};
 const regx =
   '<((!\\[CDATA\\[([\\s\\S]*?)(]]>))|((NAME:)?(NAME))([^>]*)>|((\\/)(NAME)\\s*>))([^<]*)'
   .replace(/NAME/g, util.nameRegexp);
+const xmlRegx = '^<\\?xml[\\s\\S]*?\\?>';
 
 //const tagsRegx = new RegExp("<(\\/?[\\w:\\-\._]+)([^>]*)>(\\s*"+cdataRegx+")*([^<]+)?","g");
 //const tagsRegx = new RegExp("<(\\/?)((\\w*:)?([\\w:\\-\._]+))([^>]*)>([^<]*)("+cdataRegx+"([^<]*))*([^<]+)?","g");
@@ -78,7 +79,12 @@ const getTraversalObj = function(xmlData, options) {
       xmlData = xmlData.replace(/<!--[\s\S]*?-->/g, ''); //Remove  comments
   }
 
-  const xmlObj = new (options.arrayMode === "children" ? xmlNode2 : xmlNode)('!xml');
+  const xmlTagRegx = new RegExp(xmlRegx);
+  let xmlObj = new (options.arrayMode === "children" ? xmlNode2 : xmlNode)('!xml');;
+  var xmlTag = xmlTagRegx.exec(xmlData);
+  if (xmlTag && xmlTag.length > 0) {
+      xmlObj.attrsMap = buildAttributesMap(xmlTag[0], options);
+  }
   let currentNode = xmlObj;
 
   const tagsRegx = new RegExp(regx, 'g');
